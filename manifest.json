@@ -1,8 +1,8 @@
 
   {
   "id": "/?source=pwa",
-  "name": "Fary EdTech Shop",
-  "short_name": "Fary EdTech",
+  "name": "Farypin Store",
+  "short_name": "Farypin Store",
   "description": "Menghadirkan aplikasi digital - Inovasi Teknologi untuk Pendidikan Masa Depan",
   "start_url": "./index.html",
   "display": "standalone",
