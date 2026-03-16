@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fary-edtech-auto'; 
+const CACHE_NAME = 'farypin-store-auto'; 
 const urlsToCache = [
   './',
   './index.html',
