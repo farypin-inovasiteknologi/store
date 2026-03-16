@@ -70,7 +70,7 @@ input, button, select, textarea {
 
         .container-utama { max-width: 1280px; margin: 0 auto; padding: 20px; margin-top: 110px; min-height: 70vh;}
         .hero { text-align: center; padding: 50px 20px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255,255,255,0.8); border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 50px; }
-        .hero-img { width: 100%; max-width: 500px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 15px 25px rgba(0,0,0,0.1); }
+        .hero-img { width: 100%; max-width: 600px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 15px 25px rgba(0,0,0,0.1); }
         .promo-badge { display: inline-block; background: #ef4444; color: white; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; margin-bottom: 20px; }
         .hero h1 { font-size: 1.7rem; margin-bottom: 15px; color: #1e1b4b; font-weight: 700; }
         
@@ -734,7 +734,10 @@ input, button, select, textarea {
         }
     }
 
-    function bukaProfil() { document.getElementById('modalProfil').style.display = 'flex'; }
+    function bukaProfil() { 
+    // Ganti URL di bawah ini dengan link profil/website luar Anda
+    window.open('https://www.farypin-inovasiteknologi.com', '_blank'); 
+}
     
 
    // 8. TAMPILAN PRODUK 
@@ -1183,7 +1186,7 @@ input, button, select, textarea {
 
     function openModalProduct() { document.getElementById('formProduct').reset(); document.getElementById('prod-id').value = ''; quill.root.innerHTML = ''; base64Images.prod = null; document.getElementById('preview-prod').style.display = 'none'; modalProd.show(); }
     function triggerCrop(e, target) { currentCropTarget = target; var file = e.target.files[0]; if (file) { var reader = new FileReader(); reader.onload = function(event) { document.getElementById('crop-image-container').src = event.target.result; modalCrop.show(); document.getElementById('modalCrop').addEventListener('shown.bs.modal', function () { if(cropper) cropper.destroy(); var aspect = (target === 'hero') ? 16/9 : 1/1; cropper = new Cropper(document.getElementById('crop-image-container'), { aspectRatio: aspect, viewMode: 1 }); }, {once: true}); }; reader.readAsDataURL(file); } }
-    function applyCrop() { if(cropper) { var w = (currentCropTarget === 'hero') ? 800 : 500; var h = (currentCropTarget === 'hero') ? 450 : 500; var canvas = cropper.getCroppedCanvas({ width: w, height: h }); var base64 = canvas.toDataURL('image/png'); base64Images[currentCropTarget] = base64; var preview = document.getElementById('preview-' + currentCropTarget); if(preview) { preview.src = base64; preview.style.display = 'block'; } modalCrop.hide(); } }
+    function applyCrop() { if(cropper) { var w = (currentCropTarget === 'hero') ? 850 : 400; var h = (currentCropTarget === 'hero') ? 450 : 500; var canvas = cropper.getCroppedCanvas({ width: w, height: h }); var base64 = canvas.toDataURL('image/png'); base64Images[currentCropTarget] = base64; var preview = document.getElementById('preview-' + currentCropTarget); if(preview) { preview.src = base64; preview.style.display = 'block'; } modalCrop.hide(); } }
     function cancelCrop() { document.getElementById(currentCropTarget + '-file').value = ""; base64Images[currentCropTarget] = null; modalCrop.hide(); }
     
     function submitProduct() { 
