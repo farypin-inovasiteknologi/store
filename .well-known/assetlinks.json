@@ -1,10 +1,14 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "farypin.store",
-    "sha256_cert_fingerprints": [
-      "CE:33:3B:6B:96:23:45:E2:BF:A2:1D:B0:1B:8D:60:42:3E:17:6A:6D:4A:A4:E6:B9:39:27:15:23:BC:A3:4C:1C"
-    ]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "farypin.store",
+      "sha256_cert_fingerprints": [
+        "CE:33:3B:6B:96:23:45:E2:BF:A2:1D:B0:1B:8D:60:42:3E:17:6A:6D:4A:A4:E6:B9:39:27:15:23:BC:A3:4C:1C"
+      ]
+    }
   }
-}]
+]
