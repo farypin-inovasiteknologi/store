@@ -265,6 +265,21 @@ input, button, select, textarea {
             <section class="hero"><div id="heroImageArea"></div><div id="promoArea"></div><h1 id="heroJudul">Memuat...</h1><p id="heroDeskripsi">Memuat deskripsi toko...</p></section>
             <h2 class="section-title" id="toko">Katalog Produk</h2>
             <div class="product-grid mb-5" id="daftarProduk"><div style="grid-column: 1/-1; text-align: center;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i> Mengambil data dari server...</div></div>
+
+          <div class="mt-5 p-4 bg-white rounded-4 shadow-sm border text-center position-relative overflow-hidden" style="border-color: #c7d2fe !important;">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(56, 189, 248, 0.05)); z-index: 0;"></div>
+    <div class="position-relative" style="z-index: 1;">
+        <i class="fa-solid fa-laptop-code fa-3x mb-3" style="color: #4f46e5;"></i>
+        <h3 class="fw-bold text-dark mb-2">Butuh Aplikasi Custom Khusus?</h3>
+        <p class="text-secondary mb-4 mx-auto" style="max-width: 600px; font-size: 0.95rem;">
+            Jika Anda tidak menemukan aplikasi yang sesuai di katalog, kami siap membuatkan aplikasi custom sesuai *request* (permintaan) Anda.
+        </p>
+        <button class="btn px-4 py-2 fw-bold text-white rounded-pill shadow" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); border: none;" onclick="bukaModalCustom()">
+            <i class="fa-solid fa-pen-ruler me-1"></i> Pesan Custom Sekarang
+        </button>
+    </div>
+</div>
+
         </div>
 
         <footer class="footer-pro">
@@ -1400,6 +1415,79 @@ function shareKe(platform) {
         });
     }
     modalShareInstance.hide();
+}
+
+
+function bukaModalCustom() {
+    // Siapkan desain formulir dalam bentuk HTML
+    var htmlForm = `
+        <div class="text-start" style="font-size: 0.9rem;">
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Model / Nama Aplikasi *</label>
+                <input type="text" id="cust-namaApp" class="form-control" placeholder="Cth: Sistem Manajemen Desa / Kasir">
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Deskripsikan Aplikasi yang Dipesan *</label>
+                <textarea id="cust-descApp" class="form-control" rows="3" placeholder="Jelaskan fitur-fitur yang Anda butuhkan..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Nama Pemesan *</label>
+                <input type="text" id="cust-namaPemesan" class="form-control" placeholder="Nama Lengkap / Instansi">
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Alamat Pemesan *</label>
+                <input type="text" id="cust-alamat" class="form-control" placeholder="Kota / Alamat Lengkap">
+            </div>
+            <div class="alert alert-info py-2 mb-0 mt-3 border-info" style="font-size: 0.8rem; background: #eff6ff;">
+                <i class="fa-solid fa-circle-info text-info"></i> <b>Keterangan:</b> Untuk tindak lanjut akan diteruskan melalui komunikasi via WA dengan developer.
+            </div>
+        </div>
+    `;
+
+    // Munculkan popup dengan SweetAlert2
+    Swal.fire({
+        title: 'Form Aplikasi Custom',
+        html: htmlForm,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-brands fa-whatsapp fs-5"></i> Kirim Pesan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#25D366', // Warna hijau khas WhatsApp
+        cancelButtonColor: '#6c757d',
+        width: '500px',
+        preConfirm: () => {
+            // Ambil semua data yang diketik oleh pengunjung
+            var appName = document.getElementById('cust-namaApp').value;
+            var appDesc = document.getElementById('cust-descApp').value;
+            var buyerName = document.getElementById('cust-namaPemesan').value;
+            var buyerAddress = document.getElementById('cust-alamat').value;
+
+            // Cek apakah ada kolom yang kosong
+            if (!appName || !appDesc || !buyerName || !buyerAddress) {
+                Swal.showValidationMessage('Mohon lengkapi semua kolom formulir!');
+                return false; // Jangan lanjut jika masih kosong
+            }
+            // Kirim data ke tahapan berikutnya (.then)
+            return { appName, appDesc, buyerName, buyerAddress };
+        }
+    }).then((result) => {
+        // Jika pengunjung klik tombol "Kirim Pesan"
+        if (result.isConfirmed) {
+            var data = result.value;
+            // Ambil nomor WA utama admin dari pengaturan (jika kosong pakai format umum)
+            var waAdmin = appSettings.wa || "628000000000"; 
+
+            // Rangkai teks untuk WhatsApp
+            var teksPesan = "Halo Admin " + (appSettings.profNama || "Developer") + ", saya ingin memesan aplikasi custom.%0A%0A";
+            teksPesan += "*Model/Nama Aplikasi*: " + data.appName + "%0A";
+            teksPesan += "*Deskripsi Aplikasi*: " + data.appDesc + "%0A";
+            teksPesan += "*Nama Pemesan*: " + data.buyerName + "%0A";
+            teksPesan += "*Alamat Pemesan*: " + data.buyerAddress + "%0A%0A";
+            teksPesan += "Mohon tindak lanjutnya. Terima kasih.";
+
+            // Buka tab baru menuju WhatsApp
+            window.open("https://wa.me/" + waAdmin + "?text=" + teksPesan, '_blank');
+        }
+    });
 }
 
 // ==========================================
