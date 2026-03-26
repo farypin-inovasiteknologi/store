@@ -188,6 +188,35 @@ input, button, select, textarea {
         transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
+
+/* Gaya untuk Grid Screenshot */
+.ss-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* Desktop: 6 sejajar */
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.ss-img {
+    width: 100%;
+    aspect-ratio: 3/7; /* Paksa rasio 3:7 */
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+.ss-img:hover {
+    transform: scale(1.05);
+}
+
+/* Tampilan Khusus HP */
+@media screen and (max-width: 768px) {
+    .ss-grid {
+        grid-template-columns: repeat(3, 1fr); /* HP: 3 sejajar, jadi kalau 6 gambar = 2 baris */
+        gap: 8px;
+    }
+}
     </style>
 </head>
 <body>
@@ -356,9 +385,14 @@ input, button, select, textarea {
         </div>
 
         <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
-            <h4 class="fw-bold border-bottom pb-2 mb-3"><i class="fa-solid fa-list-check text-primary"></i> Spesifikasi & Deskripsi Lengkap</h4>
-            <div id="det-desc-lengkap" style="line-height: 1.7; white-space: pre-wrap; font-size: 0.95rem; color: #4b5563;"></div>
-        </div>
+    <div id="det-ss-container" class="mb-4 d-none">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-mobile-screen text-primary"></i> Tampilan Aplikasi</h5>
+        <div class="ss-grid" id="det-ss-grid"></div>
+    </div>
+
+    <h4 class="fw-bold border-bottom pb-2 mb-3"><i class="fa-solid fa-list-check text-primary"></i> Spesifikasi & Deskripsi Lengkap</h4>
+    <div id="det-desc-lengkap" style="line-height: 1.7; white-space: pre-wrap; font-size: 0.95rem; color: #4b5563;"></div>
+</div>
 
         <div class="bg-white p-4 rounded-4 shadow-sm border mb-5">
             <h4 class="fw-bold border-bottom pb-2 mb-4"><i class="fa-solid fa-comments text-warning"></i> Penilaian & Ulasan Pembeli</h4>
@@ -507,6 +541,12 @@ input, button, select, textarea {
                             <div class="col-6 mb-2"><label class="text-muted small fw-bold">Link Demo</label><input type="text" id="prod-linkDemo" class="form-control form-control-sm"></div>
                             <div class="col-6 mb-2"><label class="text-muted small fw-bold">Link Video</label><input type="text" id="prod-linkVid" class="form-control form-control-sm"></div>
                             <div class="col-md-12 mb-2"><label class="text-muted small fw-bold">Upload Gambar</label><input type="file" id="prod-file" class="form-control form-control-sm" accept="image/*" onchange="triggerCrop(event, 'prod')"><img id="preview-prod" src="" class="mt-2 rounded" style="max-height:80px; display:none; object-fit:cover; border:1px solid #ddd;"></div>
+                            <div class="col-md-12 mb-3 border-top pt-3 mt-2">
+                            <label class="text-muted small fw-bold"><i class="fa-solid fa-images text-info"></i> Upload Screenshot App (Maks 6 Gambar)</label>
+                            <p class="text-danger" style="font-size: 0.7rem; margin-bottom:5px;">*Bisa pilih banyak gambar sekaligus. Gambar otomatis disesuaikan rasionya ke 3:7.</p>
+                            <input type="file" id="prod-ss-files" class="form-control form-control-sm" accept="image/*" multiple onchange="prosesUploadSS(event)">
+    
+                             <div id="preview-ss-container" class="d-flex flex-wrap gap-2 mt-2"></div></div>
                         </div>
                     </form>
                 </div>
@@ -549,7 +589,7 @@ input, button, select, textarea {
     // 1. KONFIGURASI API (WAJIB DIISI)
     // ==========================================
     // Nanti ganti teks di bawah ini dengan URL Web App dari Google Apps Script Anda
-    const GAS_API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbz0ZsBGvu_3gTL6iJNgQW43XeGOqSm7thtEMe19evAnUE9NzaR2JYuCRaTxZqFuHUyp/exec";
+    const GAS_API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxN65T-mQTDY_YfxIgn4a7DXmkV0ST5KWdqKQ4Vw93SIYv5sCZPMxZEvOdIfdN1Hz8T/exec";
 
     // Fungsi Pembantu untuk Request GET
     async function gasAPI_GET(action, extraParams = "") {
@@ -899,7 +939,7 @@ document.getElementById('footer-wa').innerHTML = htmlWA !== "" ? htmlWA : "-";
         var p = produkArray[i];
         var isOpsiSiswa = (p.opsiSiswa === true || p.opsiSiswa === 'true');
         var hargaCoret = p.hCoret ? "<span class='text-decoration-line-through text-muted d-block' style='font-size:0.85rem;'>Rp " + Number(p.hCoret).toLocaleString('id-ID') + "</span>" : "";
-        var hargaTampil = isOpsiSiswa ? "<small class='text-muted'>Mulai</small> Rp 100.000" : ("Rp " + Number(p.hAsli).toLocaleString('id-ID'));
+        var hargaTampil = isOpsiSiswa ? "<small class='text-muted'>Mulai</small> Rp 300.000" : ("Rp " + Number(p.hAsli).toLocaleString('id-ID'));
         
         var foto = p.fotoUrl ? p.fotoUrl.replace('sz=w1000', 'sz=w400') : "https://via.placeholder.com/300";
         var textTombolBeli = "Masukkan Keranjang";
@@ -946,56 +986,75 @@ document.getElementById('footer-wa').innerHTML = htmlWA !== "" ? htmlWA : "-";
     // 9. DETAIL PRODUK & ULASAN
     function bukaDetail(id) {
     currentViewedProductId = id; // Simpan ID produk ke memori
-    
+
     var p = null; for(var i=0; i<dbProducts.length; i++) { if(dbProducts[i].id === id) p = dbProducts[i]; }
 
-        if(!p) return;
+    if(!p) return;
         
-        document.getElementById('det-img').src = p.fotoUrl || "https://via.placeholder.com/400";
-        document.getElementById('det-nama').innerText = p.nama;
-        document.getElementById('det-harga-coret').innerText = p.hCoret ? "Rp " + Number(p.hCoret).toLocaleString('id-ID') : "";
-        document.getElementById('det-desc-singkat').innerText = p.detail;
-        document.getElementById('det-desc-lengkap').innerHTML = p.spesifikasi || p.detail || "Belum ada spesifikasi lengkap."; 
-        
-        var isOpsiSiswa = (p.opsiSiswa === true || p.opsiSiswa === 'true');
-        var btnBeli = document.getElementById('det-btn-beli');
-        var divOpsi = document.getElementById('det-opsi-siswa');
-        
-        if (isOpsiSiswa) {
-            document.getElementById('det-harga-asli').innerText = "Mulai Rp 300.000";
-            divOpsi.classList.remove('d-none');
-            document.getElementById('det-select-siswa').innerHTML = 
-   "<option value=''>Pilih Jml Siswa...</option>" +
-   "<option value='350 Siswa|300000'>1-350 Siswa (300Rb)</option>" +
-   "<option value='650 Siswa|550000'>351-650 Siswa (550Rb)</option>" +
-   "<option value='950 Siswa|800000'>651-950 Siswa (800Rb)</option>" +
-   "<option value='Unlimited Siswa|1000000'>951 Siswa ke atas (1Jt)</option>";
-            
-            btnBeli.onclick = function() {
-                var val = document.getElementById('det-select-siswa').value;
-                if(!val) { Swal.fire('Perhatian', 'Silakan pilih jumlah siswa terlebih dahulu!', 'warning'); return; }
-                var valSplit = val.split("|"); var namaVarian = valSplit[0]; var hargaVarian = parseInt(valSplit[1]);
-                var cartIdVariant = p.id + "-" + namaVarian; 
-                var exist = false; for(var j=0; j<cart.length; j++) { if(cart[j].cartId === cartIdVariant) { cart[j].qty += 1; exist = true; } }
-                if(!exist) { var itemData = Object.assign({}, p); itemData.nama = p.nama + " (" + namaVarian + ")"; itemData.hAsli = hargaVarian; itemData.qty = 1; itemData.cartId = cartIdVariant; cart.push(itemData); }
-                saveCart(); updateCartBadge(); Swal.fire('Sukses', 'Produk masuk keranjang', 'success');
-            };
-        } else {
-            document.getElementById('det-harga-asli').innerText = "Rp " + Number(p.hAsli).toLocaleString('id-ID');
-            divOpsi.classList.add('d-none');
-            btnBeli.onclick = function() { addToCart(p.id); };
+    document.getElementById('det-img').src = p.fotoUrl || "https://via.placeholder.com/400";
+    document.getElementById('det-nama').innerText = p.nama;
+    document.getElementById('det-harga-coret').innerText = p.hCoret ? "Rp " + Number(p.hCoret).toLocaleString('id-ID') : "";
+    document.getElementById('det-desc-singkat').innerText = p.detail;
+    document.getElementById('det-desc-lengkap').innerHTML = p.spesifikasi || p.detail || "Belum ada spesifikasi lengkap."; 
+
+    // --- TAMBAHAN MENAMPILKAN SCREENSHOT ---
+    let ssGrid = document.getElementById('det-ss-grid');
+    let ssContainer = document.getElementById('det-ss-container');
+    let validSS = p.screenshots ? p.screenshots.filter(url => url !== "") : [];
+    
+    if (validSS.length > 0) {
+        let ssHtml = "";
+        for(let i=0; i<validSS.length; i++) {
+            // Trik ubah link thumnail gdrive agar resolusi lebih bagus pas diklik
+            let hiResUrl = validSS[i].replace('sz=w1000', 'sz=w800');
+            ssHtml += `<img src="${validSS[i]}" class="ss-img" onclick="window.open('${hiResUrl}', '_blank')">`;
         }
-
-        var btnVid = document.getElementById('det-btn-vid');
-        if(p.linkVid) { btnVid.href = p.linkVid; btnVid.classList.remove('d-none'); } else { btnVid.classList.add('d-none'); }
-        var btnDemo = document.getElementById('det-btn-demo');
-        if(p.linkDemo) { btnDemo.href = p.linkDemo; btnDemo.classList.remove('d-none'); } else { btnDemo.classList.add('d-none'); }
-
-        document.getElementById('ulas-prod-id').value = p.id;
-        document.getElementById('formUlasan').reset(); resetBintang();
-        loadUlasan(p.id);
-        navTo('detail');
+        ssGrid.innerHTML = ssHtml;
+        ssContainer.classList.remove('d-none'); // Tampilkan div container
+    } else {
+        ssContainer.classList.add('d-none'); // Sembunyikan kalau tidak ada gambar
     }
+    // ---------------------------------------
+        
+    var isOpsiSiswa = (p.opsiSiswa === true || p.opsiSiswa === 'true');
+    var btnBeli = document.getElementById('det-btn-beli');
+    var divOpsi = document.getElementById('det-opsi-siswa');
+        
+    if (isOpsiSiswa) {
+        document.getElementById('det-harga-asli').innerText = "Mulai Rp 300.000";
+        divOpsi.classList.remove('d-none');
+        document.getElementById('det-select-siswa').innerHTML = 
+"<option value=''>Pilih Jml Siswa...</option>" +
+"<option value='350 Siswa|300000'>1-350 Siswa (300Rb)</option>" +
+"<option value='650 Siswa|550000'>351-650 Siswa (550Rb)</option>" +
+"<option value='950 Siswa|800000'>651-950 Siswa (800Rb)</option>" +
+"<option value='Unlimited Siswa|1000000'>951 Siswa ke atas (1Jt)</option>";
+            
+        btnBeli.onclick = function() {
+            var val = document.getElementById('det-select-siswa').value;
+            if(!val) { Swal.fire('Perhatian', 'Silakan pilih jumlah siswa terlebih dahulu!', 'warning'); return; }
+            var valSplit = val.split("|"); var namaVarian = valSplit[0]; var hargaVarian = parseInt(valSplit[1]);
+            var cartIdVariant = p.id + "-" + namaVarian; 
+            var exist = false; for(var j=0; j<cart.length; j++) { if(cart[j].cartId === cartIdVariant) { cart[j].qty += 1; exist = true; } }
+            if(!exist) { var itemData = Object.assign({}, p); itemData.nama = p.nama + " (" + namaVarian + ")"; itemData.hAsli = hargaVarian; itemData.qty = 1; itemData.cartId = cartIdVariant; cart.push(itemData); }
+            saveCart(); updateCartBadge(); Swal.fire('Sukses', 'Produk masuk keranjang', 'success');
+        };
+    } else {
+        document.getElementById('det-harga-asli').innerText = "Rp " + Number(p.hAsli).toLocaleString('id-ID');
+        divOpsi.classList.add('d-none');
+        btnBeli.onclick = function() { addToCart(p.id); };
+    }
+
+    var btnVid = document.getElementById('det-btn-vid');
+    if(p.linkVid) { btnVid.href = p.linkVid; btnVid.classList.remove('d-none'); } else { btnVid.classList.add('d-none'); }
+    var btnDemo = document.getElementById('det-btn-demo');
+    if(p.linkDemo) { btnDemo.href = p.linkDemo; btnDemo.classList.remove('d-none'); } else { btnDemo.classList.add('d-none'); }
+
+    document.getElementById('ulas-prod-id').value = p.id;
+    document.getElementById('formUlasan').reset(); resetBintang();
+    loadUlasan(p.id);
+    navTo('detail');
+}
 
     let starVal = 0;
     setTimeout(function() {
@@ -1304,12 +1363,38 @@ document.getElementById('footer-wa').innerHTML = htmlWA !== "" ? htmlWA : "-";
         });
     }
 
-    function editProduct(id) {
-        var p = null; for(var i=0; i<dbProducts.length; i++) { if(dbProducts[i].id === id) p = dbProducts[i]; }
-        if(!p) return;
-        document.getElementById('prod-id').value = p.id; document.getElementById('prod-nama').value = p.nama; document.getElementById('prod-detail').value = p.detail; quill.root.innerHTML = p.spesifikasi || ''; document.getElementById('prod-hCoret').value = p.hCoret || ''; document.getElementById('prod-hAsli').value = p.hAsli; document.getElementById('prod-hMidtrans').value = p.hMidtrans || ''; document.getElementById('prod-linkDemo').value = p.linkDemo || ''; document.getElementById('prod-linkVid').value = p.linkVid || ''; document.getElementById('prod-fotoUrl').value = p.fotoUrl || ''; document.getElementById('prod-opsiSiswa').checked = (p.opsiSiswa === true || p.opsiSiswa === 'true');
-        base64Images.prod = null; if(p.fotoUrl) { document.getElementById('preview-prod').src = p.fotoUrl; document.getElementById('preview-prod').style.display = 'block'; } else { document.getElementById('preview-prod').style.display = 'none'; } modalProd.show();
-    }
+function editProduct(id) {
+    var p = null; for(var i=0; i<dbProducts.length; i++) { if(dbProducts[i].id === id) p = dbProducts[i]; }
+    if(!p) return;
+    
+    document.getElementById('prod-id').value = p.id; 
+    document.getElementById('prod-nama').value = p.nama; 
+    document.getElementById('prod-detail').value = p.detail; 
+    quill.root.innerHTML = p.spesifikasi || ''; 
+    document.getElementById('prod-hCoret').value = p.hCoret || ''; 
+    document.getElementById('prod-hAsli').value = p.hAsli; 
+    document.getElementById('prod-hMidtrans').value = p.hMidtrans || ''; 
+    document.getElementById('prod-linkDemo').value = p.linkDemo || ''; 
+    document.getElementById('prod-linkVid').value = p.linkVid || ''; 
+    document.getElementById('prod-fotoUrl').value = p.fotoUrl || ''; 
+    document.getElementById('prod-opsiSiswa').checked = (p.opsiSiswa === true || p.opsiSiswa === 'true');
+    
+    base64Images.prod = null; 
+    if(p.fotoUrl) { 
+        document.getElementById('preview-prod').src = p.fotoUrl; 
+        document.getElementById('preview-prod').style.display = 'block'; 
+    } else { 
+        document.getElementById('preview-prod').style.display = 'none'; 
+    } 
+
+    // --- TAMBAHAN UNTUK SCREENSHOT ---
+    // Mengambil URL screenshot yang tidak kosong dari database
+    currentScreenshots = p.screenshots ? p.screenshots.filter(url => url !== "") : [];
+    renderPreviewSS(); // Tampilkan kotak kecil previewnya
+    // ---------------------------------
+
+    modalProd.show();
+}
 
     function hapusProduct(id) { 
         Swal.fire({ title: 'Yakin Menghapus?', text: "Produk dihapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!' }).then(function(result) { 
@@ -1389,20 +1474,57 @@ document.getElementById('footer-wa').innerHTML = htmlWA !== "" ? htmlWA : "-";
         });
     });
 
-    function openModalProduct() { document.getElementById('formProduct').reset(); document.getElementById('prod-id').value = ''; quill.root.innerHTML = ''; base64Images.prod = null; document.getElementById('preview-prod').style.display = 'none'; modalProd.show(); }
+    function openModalProduct() { 
+    document.getElementById('formProduct').reset(); 
+    document.getElementById('prod-id').value = ''; 
+    quill.root.innerHTML = ''; 
+    base64Images.prod = null; 
+    document.getElementById('preview-prod').style.display = 'none'; 
+    
+    // --- TAMBAHAN UNTUK SCREENSHOT ---
+    document.getElementById('preview-ss-container').innerHTML = '';
+    currentScreenshots = [];
+    // ---------------------------------
+    
+    modalProd.show(); 
+}
+
+
     function triggerCrop(e, target) { currentCropTarget = target; var file = e.target.files[0]; if (file) { var reader = new FileReader(); reader.onload = function(event) { document.getElementById('crop-image-container').src = event.target.result; modalCrop.show(); document.getElementById('modalCrop').addEventListener('shown.bs.modal', function () { if(cropper) cropper.destroy(); var aspect = (target === 'hero') ? 20/8 : 1/1; cropper = new Cropper(document.getElementById('crop-image-container'), { aspectRatio: aspect, viewMode: 1 }); }, {once: true}); }; reader.readAsDataURL(file); } }
     function applyCrop() { if(cropper) { var w = (currentCropTarget === 'hero') ? 1000 : 400; var h = (currentCropTarget === 'hero') ? 450 : 500; var canvas = cropper.getCroppedCanvas({ width: w, height: h }); var base64 = canvas.toDataURL('image/png'); base64Images[currentCropTarget] = base64; var preview = document.getElementById('preview-' + currentCropTarget); if(preview) { preview.src = base64; preview.style.display = 'block'; } modalCrop.hide(); } }
     function cancelCrop() { document.getElementById(currentCropTarget + '-file').value = ""; base64Images[currentCropTarget] = null; modalCrop.hide(); }
     
     function submitProduct() { 
-        var loadData = mulaiLoadingBtn('btnSaveProd', "<i class='fa-solid fa-save'></i> Simpan");
-        var productData = { id: document.getElementById('prod-id').value, nama: document.getElementById('prod-nama').value, detail: document.getElementById('prod-detail').value, spesifikasi: quill.root.innerHTML, hCoret: document.getElementById('prod-hCoret').value, hAsli: document.getElementById('prod-hAsli').value, hMidtrans: document.getElementById('prod-hMidtrans').value, linkDemo: document.getElementById('prod-linkDemo').value, linkVid: document.getElementById('prod-linkVid').value, fotoUrl: document.getElementById('prod-fotoUrl').value, opsiSiswa: document.getElementById('prod-opsiSiswa').checked }; 
-        gasAPI_POST({ action: 'saveProduct', auth: currentUser, productData: productData, base64Image: base64Images.prod }).then(res => {
-            stopLoadingBtn(loadData);
-            if(res.status === 'success') { base64Images.prod = null; modalProd.hide(); Swal.fire('Berhasil', 'Produk disimpan', 'success'); fetchProductsFromSheet(); loadAdminTable(); } 
-            else { Swal.fire('Gagal', res.message, 'error'); } 
-        });
-    }
+    var loadData = mulaiLoadingBtn('btnSaveProd', "<i class='fa-solid fa-save'></i> Simpan");
+    
+    // Kita tambahkan newScreenshots di dalam data ini
+    var productData = { 
+        id: document.getElementById('prod-id').value, 
+        nama: document.getElementById('prod-nama').value, 
+        detail: document.getElementById('prod-detail').value, 
+        spesifikasi: quill.root.innerHTML, 
+        hCoret: document.getElementById('prod-hCoret').value, 
+        hAsli: document.getElementById('prod-hAsli').value, 
+        hMidtrans: document.getElementById('prod-hMidtrans').value, 
+        linkDemo: document.getElementById('prod-linkDemo').value, 
+        linkVid: document.getElementById('prod-linkVid').value, 
+        fotoUrl: document.getElementById('prod-fotoUrl').value, 
+        opsiSiswa: document.getElementById('prod-opsiSiswa').checked,
+        newScreenshots: currentScreenshots // <-- TAMBAHANNYA DI SINI
+    }; 
+    
+    gasAPI_POST({ action: 'saveProduct', auth: currentUser, productData: productData, base64Image: base64Images.prod }).then(res => {
+        stopLoadingBtn(loadData);
+        if(res.status === 'success') { 
+            base64Images.prod = null; 
+            modalProd.hide(); 
+            Swal.fire('Berhasil', 'Produk disimpan', 'success'); 
+            fetchProductsFromSheet(); 
+            loadAdminTable(); 
+        } 
+        else { Swal.fire('Gagal', res.message, 'error'); } 
+    });
+}
 
     function bukaModalShare() {
     modalShareInstance.show();
@@ -1505,6 +1627,74 @@ function bukaModalCustom() {
         }
     });
 }
+
+// VARIABEL BARU UNTUK MENYIMPAN ARRAY SCREENSHOT DI ADMIN
+var currentScreenshots = []; 
+
+// Fungsi untuk proses pilih & kompres banyak gambar sekaligus ala WhatsApp
+function prosesUploadSS(e) {
+    let files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    let sisaSlot = 6 - currentScreenshots.length;
+    if (sisaSlot <= 0) {
+        Swal.fire('Batas Maksimal', 'Anda hanya bisa mengunggah maksimal 6 gambar.', 'warning');
+        return;
+    }
+
+    let filesToProcess = Math.min(files.length, sisaSlot);
+    
+    // Looping file yang dipilih
+    for (let i = 0; i < filesToProcess; i++) {
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            let img = new Image();
+            img.onload = function() {
+                // Kompres dan crop gambar ke rasio 3:7 (misal 300x700 pixel) agar enteng di database
+                let canvas = document.createElement('canvas');
+                canvas.width = 300; 
+                canvas.height = 700;
+                let ctx = canvas.getContext('2d');
+                
+                // Logika Crop (Object-fit Cover)
+                let scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                let x = (canvas.width / scale - img.width) / 2;
+                let y = (canvas.height / scale - img.height) / 2;
+                
+                ctx.drawImage(img, x, y, img.width, img.height, 0, 0, canvas.width, canvas.height);
+                
+                // Simpan ke array (kualitas 70% agar cepat diupload)
+                currentScreenshots.push(canvas.toDataURL('image/jpeg', 0.7)); 
+                renderPreviewSS(); // Update tampilan
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(files[i]);
+    }
+    // Kosongkan input agar bisa pilih gambar yang sama lagi jika dihapus
+    document.getElementById('prod-ss-files').value = ""; 
+}
+
+// Fungsi untuk menampilkan kotak-kotak kecil gambar di Form Admin
+function renderPreviewSS() {
+    let container = document.getElementById('preview-ss-container');
+    let html = "";
+    for (let i = 0; i < currentScreenshots.length; i++) {
+        html += `
+        <div style="position:relative; width: 60px; height: 140px;">
+            <img src="${currentScreenshots[i]}" style="width:100%; height:100%; object-fit:cover; border-radius:5px; border:1px solid #ccc;">
+            <button type="button" class="btn btn-danger btn-sm" style="position:absolute; top:-5px; right:-5px; padding: 2px 5px; font-size: 10px; border-radius:50%;" onclick="hapusPreviewSS(${i})"><i class="fa-solid fa-xmark"></i></button>
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+// Fungsi hapus satu persatu gambar di preview
+function hapusPreviewSS(index) {
+    currentScreenshots.splice(index, 1);
+    renderPreviewSS();
+}
+
 
 // ==========================================
 // KODE BARU: Logika Pop-up Google Play Store
