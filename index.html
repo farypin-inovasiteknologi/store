@@ -892,16 +892,16 @@ input, button, select, textarea {
             for(var j=0; j<adminMenus.length; j++) adminMenus[j].classList.remove('d-none');
         }
 
-        // --- KODE BARU: Langsung pindah layar ke Detail jika ada parameter produk ---
         if (initialProductId) {
-            navTo('detail'); // Pindah layar seketika
+            navTo('detail'); 
             document.getElementById('det-nama').innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Memuat produk...";
         }
-        // ----------------------------------------------------------------------------
 
         memuatPengaturan();
         fetchProductsFromSheet(); 
         fetchBuyersTicker(); 
+        // --- TAMBAHAN UNTUK BUG 1: Langsung load data opsi di awal ---
+        loadMasterOpsi(); 
     }
 
     function renderPengaturan(settings) {
@@ -1534,11 +1534,21 @@ document.getElementById('footer-wa').innerHTML = htmlWA !== "" ? htmlWA : "-";
 
     function renderCheckboxOpsi(selectedJsonStr = "") {
     let container = document.getElementById('container-opsi-harga');
-    if(dbOpsiHarga.length === 0) { container.innerHTML = "<small class='text-danger'>Master opsi kosong. Tambahkan dulu di menu Admin > Opsi Harga.</small>"; return; }
+    if(dbOpsiHarga.length === 0) { 
+        container.innerHTML = "<small class='text-danger'>Master opsi kosong. Tambahkan dulu di menu Admin > Opsi Harga.</small>"; 
+        return; 
+    }
     
     let selectedArr = [];
-    try { selectedArr = JSON.parse(selectedJsonStr); } catch(e){}
-    let selectedIds = selectedArr.map(s => s.id); // ambil ID yang dicentang sebelumnya
+    try { 
+        let parsed = JSON.parse(selectedJsonStr); 
+        // --- PERBAIKAN BUG 2: Pastikan yang di-parse benar-benar Array, bukan TRUE/FALSE lama ---
+        if (Array.isArray(parsed)) {
+            selectedArr = parsed;
+        }
+    } catch(e){}
+    
+    let selectedIds = selectedArr.map(s => s.id); // Sekarang aman, tidak akan crash
 
     let html = "";
     dbOpsiHarga.forEach(opt => {
@@ -1551,6 +1561,7 @@ document.getElementById('footer-wa').innerHTML = htmlWA !== "" ? htmlWA : "-";
     });
     container.innerHTML = html;
 }
+
 
 function openModalProduct() { 
     document.getElementById('formProduct').reset(); 
